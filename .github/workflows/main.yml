@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build1:
     name: Start Building...
     runs-on: windows-latest
     timeout-minutes: 9999
@@ -12,21 +12,11 @@ jobs:
     steps:
       - name: Downloading & Installing Essentials
         run: |
-          # Create random ID and password
-          $ID = [System.Guid]::NewGuid().ToString("N").Substring(0, 8)
-          $password = [System.Convert]::ToBase64String((1..16 | ForEach-Object { Get-Random -Minimum 0 -Maximum 255 }))
+          Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win_10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+          cmd /c Downloads.bat
 
-          # Save the ID and password to a file
-          echo "ID: $ID" >> $GITHUB_WORKSPACE/rdp_credentials.txt
-          echo "Password: $password" >> $GITHUB_WORKSPACE/rdp_credentials.txt
+      - name: Connect to LiteManager
+        run: cmd /c show.bat
 
-          # Install LiteManager (assuming you have a download link or the installer in the repository)
-          Invoke-WebRequest -Uri "https://www.litemanager.com/download/LiteManagerFree_497.zip" -OutFile "LiteManager.zip"
-          Expand-Archive LiteManager.zip -DestinationPath .\LiteManager
-          .\LiteManager\setup.exe /silent
-
-      - name: Upload RDP Credentials
-        uses: actions/upload-artifact@v3
-        with:
-          name: rdp-credentials
-          path: rdp_credentials.txt
+      - name: Time Counter
+        run: cmd /c loop.bat
